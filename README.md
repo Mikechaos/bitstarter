@@ -1,33 +1,25 @@
-# node-js-sample
+# Coursera class - Startup Engineering
+## Final Project
 
-This is a barebones Node.js app using the [Express](http://expressjs.com/) framework.
+### Quick history
+I am actually taking a marvelous class on Coursera. The instructor(s) guide you through every step of getting the foundation up and running for you own startup.
+The final project is to build a simple selfstarter based on bitcoins and market your own idea/product on it.
 
-## Running Locally
+### What is on now
+Only the basic html structure of the home page.
 
-Asumming you have [Node.js](http://nodejs.org/) and [Heroku Toolbelt](https://toolbelt.heroku.com/) installed on your machine:
+### Requirement 
+* Node
+* Express  
+    `$npm install express`
 
-```sh
-git clone git@github.com:heroku/node-js-sample.git # or clone your own fork
-cd node-js-sample
-npm install
-foreman start
-```
+### What to expect
+I am not sure how this project will evolve. We'll see as we go..!
 
-Your app should now be running on [localhost:5000](http://localhost:5000/).
+Have fun
 
-## Deploying to Heroku
-
-```
-heroku create
-git push heroku master
-heroku open
-```
-
-## Documentation
-
-For more information about using Node.js on Heroku, see these Dev Center articles:
-
-- [Getting Started with Node.js on Heroku](https://devcenter.heroku.com/articles/nodejs)
-- [Heroku Node.js Support](https://devcenter.heroku.com/articles/nodejs-support)
-- [Building a Real-time, Polyglot Application with Node.js, Ruby, MongoDB and Socket.IO](https://devcenter.heroku.com/articles/realtime-polyglot-app-node-ruby-mongodb-socketio)
-- [Using Socket.IO with Node.js on Heroku](https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku)
+### Link
+* Class => https://class.coursera.org/startup-001/  
+Though it is finish so you won't be able to join..
+* node-sample-js => https://github.com/heroku/node-js-sample  
+This repo is based on the sample node app from heroku
