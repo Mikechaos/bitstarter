@@ -10,11 +10,21 @@ Only the basic html structure of the home page.
 
 ### Requirement 
 * Node
-* Express  
-    `$npm install express`
+* [Express](http://expressjs.com/ "Express Doc") $`npm install express`  
+* For grader (HW3)
+    * [Restler](https://github.com/danwrong/restler, "Restler on Github") $`npm install restler`
+    * [Cheerio](https://github.com/MatthewMueller/cheerio, "Cheerio on Github") $`npm install cheerio`
+
 
 ### What to expect
-I am not sure how this project will evolve. We'll see as we go..!
+I am not sure how this project will evolve. I have many ideas. What you will probably see in the future
+- Some Clojure on the server side might be coming.  
+  Want to check if clojure and node can work together
+- CoffeeScript in place of Javascript
+- An actual project. Ideas..
+    - ... not yet!
+
+We'll see as we go..!
 
 Have fun
 
