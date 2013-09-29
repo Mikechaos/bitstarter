@@ -29,6 +29,7 @@ var CHECKSFILE_DEFAULT = "checks.json";
 
 var sys = require('util'),
     rest = require('restler');
+var test = {};
 
 var read_url = function(url) {
     var that = {}
@@ -37,10 +38,21 @@ var read_url = function(url) {
 	    sys.puts('Error: ' + result.message);
 	    this.retry(5000); // try again after 5 sec
 	} else {
-	    that.result = this;
+	    global_load(result)
 	}
+	return 'test';
     });
-    console.log(ret_result);
+    // var i = 0;
+    // while (!test.result);
+    // console.log(test.result);
+};
+
+var global_load = function (content) {
+    if (arguments.length === 0) return this.result;
+    this.result = content;
+    // console.log(content);
+    return content;
+
 };
 
 var assertFileExists = function(infile) {
@@ -59,7 +71,7 @@ var cheerioHtmlFile = function(htmlfile) {
 };
 
 
-var cheerioUrl = function(url) {
+var cheerioUrl = function(content) {
     return cheerio.load(read_url(url).result)
 };
 
@@ -91,14 +103,32 @@ if(require.main == module) {
 	.option('-u, --url <url_to_file', 'Url to html file')
         .parse(process.argv);
     var checkJson;
-    console.log(read_url(program.url));
-    // if (program.url)
-    // 	checkJson = checkHtmlFile(cheerioUrl, program.url, program.checks);
-    // else
-    // 	checkJson = checkHtmlFile(cheerioHtmlFile, program.file, program.checks);
-    // var outJson = JSON.stringify(checkJson, null, 4);
+    if (program.url) {
+	var content;
+	read_url(program.url);
+	var myVar = setInterval(function () {
+	    if (content = global_load()) {
+		clearInterval(myVar);
+		// console.log(content);
+    		checkJson = checkHtmlFile(cheerio.load, content, program.checks);
+	    }
+	}, 1000);
+
+    } else {
+    	checkJson = checkHtmlFile(cheerioHtmlFile, program.file, program.checks);
+    }
+    var myInterval = setInterval(function () {
+	if (checkJson) {
+	    var outJson = JSON.stringify(checkJson, null, 4);
+	    console.log(outJson);
+	    clearInterval(myInterval);
+	}
+    }, 1000)
     // console.log(outJson);
-    // console.log(read_url(program.url));
 } else {
     exports.checkHtmlFile = checkHtmlFile;
+}
+
+var t = function () {
+    var myTimeout = setTimeout({}, 99999999)
 }
