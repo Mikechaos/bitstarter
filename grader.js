@@ -21,6 +21,7 @@ References:
    - https://developer.mozilla.org/en-US/docs/JSON#JSON_in_Firefox_2
 */
 
+
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
@@ -30,29 +31,26 @@ var CHECKSFILE_DEFAULT = "checks.json";
 var sys = require('util'),
     rest = require('restler');
 var test = {};
+ 
+var get_url_content = function (content) {
+    if (arguments.length === 0) return this.result;
+    this.result = content;
+    return content;
+
+};
+
 
 var read_url = function(url) {
     var that = {}
     var ret_result = rest.get(url).on('complete', function(result) {
 	if (result instanceof Error) {
 	    sys.puts('Error: ' + result.message);
-	    this.retry(5000); // try again after 5 sec
+	    this.retry(5000);
 	} else {
-	    global_load(result)
+	    get_url_content(result)
 	}
 	return 'test';
     });
-    // var i = 0;
-    // while (!test.result);
-    // console.log(test.result);
-};
-
-var global_load = function (content) {
-    if (arguments.length === 0) return this.result;
-    this.result = content;
-    // console.log(content);
-    return content;
-
 };
 
 var assertFileExists = function(infile) {
@@ -65,22 +63,12 @@ var assertFileExists = function(infile) {
 };
 
 
-
-var cheerioHtmlFile = function(htmlfile) {
-    return cheerio.load(fs.readFileSync(htmlfile));
-};
-
-
-var cheerioUrl = function(content) {
-    return cheerio.load(read_url(url).result)
-};
-
 var loadChecks = function(checksfile) {
     return JSON.parse(fs.readFileSync(checksfile));
 };
 
-var checkHtmlFile = function(load_fn, load_content, checksfile) {
-    $ = load_fn(load_content);
+var checkHtmlFile = function(load_content, checksfile) {
+    $ = cheerio.load(load_content);
     var checks = loadChecks(checksfile).sort();
     var out = {};
     for(var ii in checks) {
@@ -96,39 +84,47 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
+var make_autoclear_async = function (predicate, body, elapse) {
+    var int;
+    elapse = elapse || 500;
+    body = body || function () {};
+    return int = setInterval(function () {
+	if (predicate()) {
+	    clearInterval(int);
+	    return body(int);
+	}
+    }, elapse)
+};
+
+var get_async_content = function (url) {
+    var async = {};
+    read_url(url);
+    return async = make_autoclear_async(get_url_content)
+};
+
 if(require.main == module) {
     program
-        .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
-        .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
+	.option('-c, --checks <check_file>', 'Path to checks.json',
+		clone(assertFileExists), CHECKSFILE_DEFAULT)
+	.option('-f, --file <html_file>', 'Path to index.html',
+		clone(assertFileExists), HTMLFILE_DEFAULT)
 	.option('-u, --url <url_to_file', 'Url to html file')
-        .parse(process.argv);
+	.parse(process.argv);
+    
     var checkJson;
-    if (program.url) {
-	var content;
-	read_url(program.url);
-	var myVar = setInterval(function () {
-	    if (content = global_load()) {
-		clearInterval(myVar);
-		// console.log(content);
-    		checkJson = checkHtmlFile(cheerio.load, content, program.checks);
-	    }
-	}, 1000);
-
-    } else {
-    	checkJson = checkHtmlFile(cheerioHtmlFile, program.file, program.checks);
-    }
-    var myInterval = setInterval(function () {
-	if (checkJson) {
-	    var outJson = JSON.stringify(checkJson, null, 4);
-	    console.log(outJson);
-	    clearInterval(myInterval);
-	}
-    }, 1000)
-    // console.log(outJson);
+    var content;
+    
+    if (program.url) get_async_content(program.url);
+    else content = fs.readFileSync(program.file);
+    
+    // Also act as a predicate like use in make_autoclear_async
+    var get_content = function () {return content || get_url_content();};
+    var checkHtml = function () {
+	var check = checkHtmlFile(get_content(), program.checks);
+	var outJson = JSON.stringify(check, null, 4);
+	console.log(outJson);
+    };
+    var outputJson = make_autoclear_async(get_content, checkHtml);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
-}
-
-var t = function () {
-    var myTimeout = setTimeout({}, 99999999)
 }
