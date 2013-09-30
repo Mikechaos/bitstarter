@@ -21,7 +21,6 @@ References:
    - https://developer.mozilla.org/en-US/docs/JSON#JSON_in_Firefox_2
 */
 
-
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
@@ -39,17 +38,14 @@ var get_url_content = function (content) {
 
 };
 
-
 var read_url = function(url) {
-    var that = {}
-    var ret_result = rest.get(url).on('complete', function(result) {
+    rest.get(url).on('complete', function(result) {
 	if (result instanceof Error) {
 	    sys.puts('Error: ' + result.message);
 	    this.retry(5000);
 	} else {
 	    get_url_content(result)
 	}
-	return 'test';
     });
 };
 
