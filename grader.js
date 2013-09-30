@@ -20,7 +20,7 @@ References:
    - https://developer.mozilla.org/en-US/docs/JSON
    - https://developer.mozilla.org/en-US/docs/JSON#JSON_in_Firefox_2
 */
-
+ 
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
@@ -93,9 +93,8 @@ var make_autoclear_async = function (predicate, body, elapse) {
 };
 
 var get_async_content = function (url) {
-    var async = {};
     read_url(url);
-    return async = make_autoclear_async(get_url_content)
+    return make_autoclear_async(get_url_content)
 };
 
 if(require.main == module) {
