@@ -1,6 +1,3 @@
-#!/usr/bin/env node
-# 
-
 $ = {}
 fs = require 'fs';
 program = require 'commander'
@@ -18,8 +15,6 @@ read_url = (url, cb) ->
                         @retry(5000);
                 else
                         cb(result)
-
-
                    
 assertFileExists = (infile) ->
   instr = infile.toString()
@@ -46,7 +41,6 @@ get_content = (autocb) ->
                 await read_url program.url, defer content
                 content
         else fs.readFileSync program.file
-                
 
 if require.main is module
   program
@@ -56,8 +50,6 @@ if require.main is module
             clone(assertFileExists), HTMLFILE_DEFAULT)
     .option('-u, --url <url_to_file', 'Url to html file')
     .parse(process.argv);
-    # program.url = undefined
-    # program.file = "index.thtml"
     await get_content defer content
     check = checkHtmlFile content, program.checks
     outJson = JSON.stringify check, null, 4
