@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+# 
 
 $ = {}
 fs = require 'fs';
@@ -10,47 +11,13 @@ CHECKSFILE_DEFAULT = "checks.json"
 sys = require 'util'
 rest = require 'restler'
 
-program.url = "http://ec2-54-200-102-151.us-west-2.compute.amazonaws.com:8080/"
-# program.url = "http://google.ca"
-program.checks = "checks.json"
-
-get_url_content = (content) -> 
-  return @result if arguments.length is 0
-  @result = content
-
-
-# make_autoclear_async = (predicate, body = (->), elapse = 500) ->
-#   console.log predicate.call(null)
-#   int = setInterval ->
-#     if predicate.call(null)
-#       clearInterval(int)
-#       console.log 'true'
-#       body.call(null, int)
-#     else
-#       console.log 'test'
-#    , elapse
- 
-make_autoclear_async = (predicate) ->
-  console.log predicate.call null
-    await
-      int = setInterval ->
-        if predicate.call null
-          clearInterval(int)
-          console.log 'test'
-          content = predicate.call null
-          defer()
-      , 500
-
-read_url = (url) ->
+read_url = (url, cb) ->
         rest.get(url).on 'complete', (result) ->
                 if result instanceof Error
                         sys.puts('Error: ' + result.message);
                         @retry(5000);
                 else
-                        get_url_content result
-        await make_autoclear_async -> get_url_content()?
-        console.log get_url_content()
-        return get_url_content()
+                        cb(result)
 
 
                    
@@ -74,11 +41,12 @@ checkHtmlFile = (content, checksfile) ->
 
 clone = (fn) -> fn.bind {}
 
-get_content = ->
+get_content = (autocb) ->
         if program.url?
-                read_url program.url
+                await read_url program.url, defer content
+                content
         else fs.readFileSync program.file
-        
+                
 
 if require.main is module
   program
@@ -89,11 +57,10 @@ if require.main is module
     .option('-u, --url <url_to_file', 'Url to html file')
     .parse(process.argv);
     # program.url = undefined
-    # program.file = "index.html"
-    content = get_content()
-    console.log content
+    # program.file = "index.thtml"
+    await get_content defer content
     check = checkHtmlFile content, program.checks
     outJson = JSON.stringify check, null, 4
-    console.log outJson
+    sys.puts outJson
 else
   exports.checkHtmlFile = checkHtmlFilecontent = Fs.readFileSync Program.file
