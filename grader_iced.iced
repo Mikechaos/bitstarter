@@ -8,7 +8,7 @@ CHECKSFILE_DEFAULT = "checks.json"
 sys = require 'util'
 rest = require 'restler'
 
-
+# test
 read_url = (url, cb) ->
   rest.get(url).on 'complete', (result) ->
     if result instanceof Error
