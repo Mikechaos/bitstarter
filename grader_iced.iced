@@ -8,13 +8,14 @@ CHECKSFILE_DEFAULT = "checks.json"
 sys = require 'util'
 rest = require 'restler'
 
+
 read_url = (url, cb) ->
-        rest.get(url).on 'complete', (result) ->
-                if result instanceof Error
-                        sys.puts('Error: ' + result.message);
-                        @retry(5000);
-                else
-                        cb(result)
+  rest.get(url).on 'complete', (result) ->
+    if result instanceof Error
+      sys.puts('Error: ' + result.message);
+      @retry(5000);
+    else
+      cb(result)
                    
 assertFileExists = (infile) ->
   instr = infile.toString()
@@ -37,10 +38,10 @@ checkHtmlFile = (content, checksfile) ->
 clone = (fn) -> fn.bind {}
 
 get_content = (autocb) ->
-        if program.url?
-                await read_url program.url, defer content
-                content
-        else fs.readFileSync program.file
+  if program.url?
+    await read_url program.url, defer content
+    content
+  else fs.readFileSync program.file
 
 if require.main is module
   program
@@ -50,9 +51,9 @@ if require.main is module
             clone(assertFileExists), HTMLFILE_DEFAULT)
     .option('-u, --url <url_to_file', 'Url to html file')
     .parse(process.argv);
-    await get_content defer content
-    check = checkHtmlFile content, program.checks
-    outJson = JSON.stringify check, null, 4
-    sys.puts outJson
+  await get_content defer content
+  check = checkHtmlFile content, program.checks
+  outJson = JSON.stringify check, null, 4
+  sys.puts outJson
 else
   exports.checkHtmlFile = checkHtmlFilecontent = Fs.readFileSync Program.file
