@@ -1,22 +1,8 @@
- fs = require 'fs'
+fs = require 'fs'
 
 {exec} = require 'child_process'
 
 option '-f', '--file [file]', 'file to compile. Will result in a useable command-line file'
-
-task 'build:script', 'Build project adding shabang for command-line use', (options) ->
-  exec "iced -c #{options.file}", (err, stdout, stderr) ->
-  # exec 'iced -c grader_iced.iced', (err, stdout, stderr) ->
-    throw err if err
-    js_file = options.file.replace /((\.iced$)|(\.coffee$))/, ".js"
-    js = fs.readFileSync(js_file)
-    js = SHABANG + js
-    fs.writeFileSync(js_file, js)
-    exec "chmod 777 #{js_file}"
-
-task 'list-ic', 'test', ->
-  await list_ic_files defer ic_list
-  console.log ic_list
 
 # fetch a list of files matching /pattern/
 # stdout : string with matching files, \n as separator
@@ -58,35 +44,54 @@ compile_file = (ic_file, cb) ->
     throw err if err
     cb content
 
-compile_all = ->
-  ic_files = await list_ic_files defer ic_list
-  js_files = replace_list_with_js ic_list
-  contents = []
-  make_file_a_script ic_file for ic_file in ic_list
-  
 make_file_executable = (file) ->
   exec "chmod 777 #{file}"
 
+# Add Shabang to beginning of file
+# so it can be used as a cmd line script
 add_shabang = (file) ->
   SHABANG = "#!/usr/bin/env node \n"
-  ADDTEXT = SHABANG + "// Produce by X task\n"
+  ADDTEXT = SHABANG + "// Produce by make-ic-scripts task\n"
   js = fs.readFileSync(file)
   js_script = ADDTEXT + js
   fs.writeFileSync(file, js_script)
 
+# General procedure to make a script useable
+# at command line
 make_file_a_script = (ic_file) ->
   compile_file ic_file, (content) ->
     js_file = replace_ic_with_js ic_file
     add_shabang js_file
-    make_file_exectuable js_file
+    make_file_executable js_file
   
-
+# Treat a whole list of file
 make_list_scripts = (ic_list) ->
   make_file_a_script ic_file for ic_file in ic_list
   return;
 
-task 'make-ic-scripts', 'test',  ->
-  # await list_ic_file_and_replace defer js_list
+
+task 'list-ic', 'List .iced and .coffee file in current dir', ->
   await list_ic_files defer ic_list
   console.log ic_list
+
+
+task 'build:script', 'Build project adding shabang for command-line use', (options) ->
+  exec "iced -c #{options.file}", (err, stdout, stderr) ->
+  # exec 'iced -c grader_iced.iced', (err, stdout, stderr) ->
+    throw err if err
+    make_file_a_script options.file
+
+
+# Description is in proper format to fit icake listing task
+# I'll see if I keep that format.. maybe a be clumpy.
+task 'make-ic-scripts',
+  '''
+  Compile all the .iced and .coffee script
+                            # Using appropriate command (iced -c | coffee -c)
+                            # Makes every .js output file executable at command line
+                            # By making file executable and adding proper SHABANG for node
+  ''',
+  ->
+    await list_ic_files defer ic_list
+    make_list_scripts ic_list
  
